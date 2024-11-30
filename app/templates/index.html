@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Web App</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Welcome to My Flask App!</h1>
+    <p>This page looks better with CSS!</p>
+
+    <!-- Form to Add Data -->
+    <h2>Add Data to MongoDB</h2>
+    <form id="addDataForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <br>
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required>
+        <br>
+        <button type="submit">Add Data</button>
+    </form>
+    <p id="addResponse"></p>
+
+    <!-- Button to Get All Data -->
+    <h2>View All Data</h2>
+    <button id="viewDataButton">Get All Data</button>
+    <pre id="dataOutput"></pre>
+
+    <!-- Form to Query Data -->
+    <h2>Query Data</h2>
+    <form id="queryDataForm">
+        <label for="queryName">Name:</label>
+        <input type="text" id="queryName" name="queryName">
+        <br>
+        <button type="submit">Query</button>
+    </form>
+    <pre id="queryOutput"></pre>
+
+    <script>
+        // JavaScript for handling form submissions and API calls
+
+        // Add Data to MongoDB
+        document.getElementById('addDataForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const age = document.getElementById('age').value;
+
+            const response = await fetch('/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, age }),
+            });
+
+            const result = await response.json();
+            document.getElementById('addResponse').textContent = result.message || JSON.stringify(result);
+        });
+
+        // Get All Data
+        document.getElementById('viewDataButton').addEventListener('click', async () => {
+            const response = await fetch('/data');
+            const result = await response.json();
+            document.getElementById('dataOutput').textContent = JSON.stringify(result, null, 2);
+        });
+
+        // Query Data
+        document.getElementById('queryDataForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const queryName = document.getElementById('queryName').value;
+
+            const response = await fetch(`/find?name=${encodeURIComponent(queryName)}`);
+            const result = await response.json();
+            document.getElementById('queryOutput').textContent = JSON.stringify(result, null, 2);
+        });
+    </script>
+</body>
+</html>
+
